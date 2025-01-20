@@ -19,7 +19,7 @@ def extract_recommendations(pdf_text):
     """Extracts recommendations, COR, and LOE from the PDF text."""
     recommendations = []
     
-    # Regex patterns for COR and LOE
+    # Regex patterns for COR, LOE, and Recommendations
     cor_pattern = r"(?i)Class of Recommendation\s*:\s*(COR\s*[A-C1-3]*)"
     loe_pattern = r"(?i)Level of Evidence\s*:\s*(LOE\s*[A-C1-3]*)"
     recommendation_pattern = r"(?i)Recommendation\s*:\s*(.*?)\n"
