@@ -1,18 +1,18 @@
 import json
 import re
-from PyPDF2 import PdfReader, errors
+import fitz  # PyMuPDF
 import streamlit as st
 
 def extract_text_from_pdf(pdf_file):
-    """Extracts text from a PDF file with error handling."""
+    """Extracts text from a PDF file using PyMuPDF."""
     try:
-        reader = PdfReader(pdf_file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
+        with fitz.open(stream=pdf_file.read(), filetype="pdf") as doc:
+            text = ""
+            for page in doc:
+                text += page.get_text()
         return text
-    except errors.PdfReadError:
-        st.error("Failed to read the PDF file. It may be corrupted or unsupported.")
+    except Exception as e:
+        st.error(f"Failed to read the PDF file: {e}")
         return None
 
 def extract_recommendations(pdf_text):
