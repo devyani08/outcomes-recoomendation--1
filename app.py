@@ -1,15 +1,19 @@
 import json
 import re
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfReader, errors
 import streamlit as st
 
-def extract_text_from_pdf(pdf_path):
-    """Extracts text from a PDF file."""
-    reader = PdfReader(pdf_path)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text()
-    return text
+def extract_text_from_pdf(pdf_file):
+    """Extracts text from a PDF file with error handling."""
+    try:
+        reader = PdfReader(pdf_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text()
+        return text
+    except errors.PdfReadError:
+        st.error("Failed to read the PDF file. It may be corrupted or unsupported.")
+        return None
 
 def extract_recommendations(pdf_text):
     """Extracts recommendations, COR, and LOE from the PDF text."""
@@ -56,21 +60,22 @@ def main():
         # Extract text from the uploaded PDF
         pdf_text = extract_text_from_pdf(uploaded_file)
 
-        # Extract recommendations
-        recommendations = extract_recommendations(pdf_text)
+        if pdf_text:
+            # Extract recommendations
+            recommendations = extract_recommendations(pdf_text)
 
-        # Display recommendations
-        st.subheader("Extracted Recommendations")
-        st.json(recommendations)
+            # Display recommendations
+            st.subheader("Extracted Recommendations")
+            st.json(recommendations)
 
-        # Option to download JSON
-        recommendations_json = json.dumps(recommendations, indent=4)
-        st.download_button(
-            label="Download Recommendations as JSON",
-            data=recommendations_json,
-            file_name="recommendations.json",
-            mime="application/json"
-        )
+            # Option to download JSON
+            recommendations_json = json.dumps(recommendations, indent=4)
+            st.download_button(
+                label="Download Recommendations as JSON",
+                data=recommendations_json,
+                file_name="recommendations.json",
+                mime="application/json"
+            )
 
 if __name__ == "__main__":
     main()
